@@ -1,8 +1,16 @@
 package com.tfg.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tfg.dto.CategoryDTO;
+import com.tfg.dto.ProductDTO;
+import lombok.Data;
 import net.datafaker.Faker;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,14 +18,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.tfg.entity.*;
 import com.tfg.repository.*;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 @Component
 @RequiredArgsConstructor
 public class DataSeeder {
+
+    @Value("${OPENAI_API_KEY}")
+    private String apiKey;
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
@@ -35,10 +53,11 @@ public class DataSeeder {
     @Transactional
     public void seedData() {
         seedRoles();
-        seedCategories();
+        //seedCategories();
         seedWarehouses();
+        seedCategoriesAndProducts();
         seedUsers();
-        seedProducts();
+        //seedProducts();
         seedInventory();
         seedTransactions();
         //seedAuditLogs();
@@ -86,13 +105,13 @@ public class DataSeeder {
             roleRepository.saveAll(List.of(
                     new Role("admin", "[\"full_access\"]", true),
                     new Role("marketing", "[\"view_reports\", \"view_stats\"]", true),
-                    new Role("reponedor", "[\"manage_inventory\", \"view_alerts\" \"manage_transactions\"]", false),
+                    new Role("reponedor", "[\"manage_inventory\", \"view_alerts\", \"manage_transactions\"]", false),
                     new Role("manager", "[\"create_users\", \"manage_inventory\", \"view_alerts\", \"manage_transactions\"]", false)
             ));
         }
     }
 
-    private void seedCategories() {
+    private void seedCategoriesFallback() {
         if (categoryRepository.count() == 0) {
             IntStream.range(0, 6).forEach(i -> categoryRepository.save(
                     new Category(faker.commerce().department(), faker.lorem().sentence())
@@ -109,7 +128,7 @@ public class DataSeeder {
     }
 
 
-    private void seedProducts() {
+    private void seedProductsFallback() {
         if (productRepository.count() == 0) {
             List<Category> categories = categoryRepository.findAll();
             IntStream.range(0, 200).forEach(i -> productRepository.save(
@@ -166,4 +185,167 @@ public class DataSeeder {
             ));
         }
     }
+
+    private void seedCategoriesAndProducts() {
+        if (categoryRepository.count() == 0 && productRepository.count() == 0) {
+            try {
+                String tema = "ropa y accesorios de moda";
+                int numeroCategorias = 5;
+                List<String> nombresGenerados = new ArrayList<>();
+                List<Category> categorias = new ArrayList<>();
+                List<Product> productos = new ArrayList<>();
+
+                for (int i = 1; i <= numeroCategorias; i++) {
+                    String exclusiones = nombresGenerados.isEmpty()
+                            ? ""
+                            : String.join(", ", nombresGenerados) + ".";
+
+                    String ejemplo = """
+[
+  {
+    "nombre_categoria": "Lácteos",
+    "descripcion": "Productos derivados de la leche.",
+    "productos": [
+      {
+        "nombre": "Leche entera",
+        "sku": "12345678",
+        "descripcion": "Leche entera pasteurizada ideal para el desayuno.",
+        "precio": 1.2
+      }
+    ]
+  }
+]
+""";
+
+                    String prompt = "Genera un JSON con UNA sola categoría relacionada con " + tema + "." +
+                            " El nombre debe ser coherente con la temática y distinto a: " + tema + ", " +
+                            exclusiones + " Añade entre 10 y 20 productos para esa categoría, cada uno con: nombre, SKU (8 dígitos), descripción y precio." +
+                            " Usa esta estructura exacta (no reutilices los datos):\n" + ejemplo;
+
+                    String rawJson = callOpenAI(prompt);
+                    String jsonContent = extractJsonContent(rawJson);
+
+                    List<Category> nuevasCategorias = parseAndSaveCategoriesFromJson(jsonContent);
+                    List<Product> nuevosProductos = parseAndSaveProductsFromJson(jsonContent, nuevasCategorias);
+
+                    for (Category c : nuevasCategorias) {
+                        if (nombresGenerados.contains(c.getName())) {
+                            throw new RuntimeException("Nombre de categoría duplicado detectado en la iteración " + i);
+                        }
+                        nombresGenerados.add(c.getName());
+                        categorias.add(c);
+                    }
+                    productos.addAll(nuevosProductos);
+                }
+
+                if (categorias.isEmpty() || productos.isEmpty()) {
+                    throw new RuntimeException("No se generaron categorías o productos válidos");
+                }
+
+            } catch (Exception e) {
+                System.out.println("Error al usar la API. Usando seeder clásico. Motivo: " + e.getMessage());
+                seedCategoriesFallback();
+                seedProductsFallback();
+            }
+        }
+    }
+
+
+    private String callOpenAI(String prompt) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+
+        String body = "{"
+                + "\"model\":\"gpt-3.5-turbo\","
+                + "\"messages\":[{\"role\":\"user\",\"content\":\"" +  escapeJson(prompt) + "\"}]"
+                + "}";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.openai.com/v1/chat/completions"))
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
+    private String escapeJson(String text) {
+        return text.replace("\"", "\\\"").replace("\n", "\\n");
+    }
+
+    private List<Category> parseAndSaveCategoriesFromJson(String json) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        List<CategoriaGeneradaDTO> categoriasDTO = mapper.readValue(json, new TypeReference<>() {});
+
+        List<Category> categorias = new ArrayList<>();
+        for (CategoriaGeneradaDTO dto : categoriasDTO) {
+            Category category = new Category(dto.getNombre(), dto.getDescripcion());
+            categoryRepository.save(category);
+            categorias.add(category);
+        }
+        return categorias;
+    }
+
+    private List<Product> parseAndSaveProductsFromJson(String json, List<Category> categoriasGuardadas) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        List<CategoriaGeneradaDTO> categoriasDTO = mapper.readValue(json, new TypeReference<>() {});
+
+        Map<String, Category> nombreToCategoria = categoriasGuardadas.stream()
+                .collect(Collectors.toMap(Category::getName, c -> c));
+
+        List<Product> productos = new ArrayList<>();
+        for (CategoriaGeneradaDTO dto : categoriasDTO) {
+            Category categoria = nombreToCategoria.get(dto.getNombre());
+            if (categoria == null) continue;
+
+            for (ProductoGeneradoDTO p : dto.getProductos()) {
+                Boolean existeSKU = true;
+                while(existeSKU){
+                    String sku = p.getSku();
+                    if (productRepository.existsBySku(sku)) {
+                        sku = faker.number().digits(8);
+                        p.setSku(sku);
+                    } else {
+                        existeSKU = false;
+                    }
+                }
+                Product producto = new Product(
+                        p.getNombre(),
+                        p.getSku(),
+                        p.getDescripcion(),
+                        p.getPrecio(),
+                        faker.number().numberBetween(1, 50),
+                        categoria
+                );
+                productRepository.save(producto);
+                productos.add(producto);
+            }
+        }
+        return productos;
+    }
+
+    @Data
+    static class CategoriaGeneradaDTO {
+        @JsonProperty("nombre_categoria")
+        private String nombre;
+        private String descripcion;
+        private List<ProductoGeneradoDTO> productos;
+    }
+
+    @Data
+    static class ProductoGeneradoDTO {
+        private String nombre;
+        private String sku;
+        private String descripcion;
+        private BigDecimal precio;
+    }
+
+    private String extractJsonContent(String responseBody) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(responseBody);
+        return root.path("choices").get(0).path("message").path("content").asText();
+    }
+
 }
