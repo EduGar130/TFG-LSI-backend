@@ -37,6 +37,12 @@ public class DataSeeder {
     @Value("${OPENAI_API_KEY}")
     private String apiKey;
 
+    @Value("${tema_inventario}")
+    private String temaInventario;
+
+    @Value("${num_categorias}")
+    private String numeroCategorias;
+
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -189,8 +195,7 @@ public class DataSeeder {
     private void seedCategoriesAndProducts() {
         if (categoryRepository.count() == 0 && productRepository.count() == 0) {
             try {
-                String tema = "ropa y accesorios de moda";
-                int numeroCategorias = 5;
+                int numeroCategorias = Integer.parseInt(this.numeroCategorias);
                 List<String> nombresGenerados = new ArrayList<>();
                 List<Category> categorias = new ArrayList<>();
                 List<Product> productos = new ArrayList<>();
@@ -217,9 +222,9 @@ public class DataSeeder {
 ]
 """;
 
-                    String prompt = "Genera un JSON con UNA sola categoría relacionada con " + tema + "." +
-                            " El nombre debe ser coherente con la temática y distinto a: " + tema + ", " +
-                            exclusiones + " Añade entre 10 y 20 productos para esa categoría, cada uno con: nombre, SKU (8 dígitos), descripción y precio." +
+                    String prompt = "Genera un JSON con UNA sola categoría relacionada con " + temaInventario + "." +
+                            " El nombre debe ser coherente con la temática y distinto a: " + temaInventario + ", " +
+                            exclusiones + " Añade 10 productos para esa categoría, cada uno con: nombre, SKU (8 dígitos), descripción y precio." +
                             " Usa esta estructura exacta (no reutilices los datos):\n" + ejemplo;
 
                     String rawJson = callOpenAI(prompt);
