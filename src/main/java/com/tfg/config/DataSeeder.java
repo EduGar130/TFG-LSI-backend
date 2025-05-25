@@ -49,6 +49,7 @@ public class DataSeeder {
     private final ProductRepository productRepository;
     private final WarehouseRepository warehouseRepository;
     private final InventoryRepository inventoryRepository;
+    private final InventoryAlertRepository inventoryAlertRepository;
     private final TransactionRepository transactionRepository;
     private final AuditLogRepository auditLogRepository;
     private final PasswordEncoder passwordEncoder;
@@ -66,6 +67,7 @@ public class DataSeeder {
         //seedProducts();
         seedInventory();
         seedTransactions();
+        createAlerts();
         //seedAuditLogs();
     }
 
@@ -222,7 +224,7 @@ public class DataSeeder {
 ]
 """;
 
-                    String prompt = "Genera un JSON con UNA sola categoría relacionada con " + temaInventario + "." +
+                    String prompt = "Genera en español de españa un JSON con UNA sola categoría relacionada con " + temaInventario + "." +
                             " El nombre debe ser coherente con la temática y distinto a: " + temaInventario + ", " +
                             exclusiones + " Añade 10 productos para esa categoría, cada uno con: nombre, SKU (8 dígitos), descripción y precio." +
                             " Usa esta estructura exacta (no reutilices los datos):\n" + ejemplo;
@@ -353,4 +355,18 @@ public class DataSeeder {
         return root.path("choices").get(0).path("message").path("content").asText();
     }
 
+    private void createAlerts() {
+        List<Inventory> inventories = inventoryRepository.findAll();
+        for (Inventory inventory : inventories) {
+            // Verifica si la cantidad de inventario es menor o igual al umbral de alerta y no existe una alerta previa
+            if ((inventory.getQuantity() <= inventory.getProduct().getStockAlertThreshold()) &&
+            inventoryAlertRepository.findByProductAndWarehouse(inventory.getProduct(), inventory.getWarehouse()).isEmpty()) {
+                String message = String.format("El producto %s en: %s tiene un stock bajo: %d unidades. Stock mínimo: %d unidades.",
+                        inventory.getProduct().getName(), inventory.getWarehouse().getName(), inventory.getQuantity(), inventory.getProduct().getStockAlertThreshold());
+
+                InventoryAlert alert = new InventoryAlert(inventory.getProduct(), inventory.getWarehouse(), "Stock bajo", message);
+                inventoryAlertRepository.save(alert);
+            }
+        }
+    }
 }
