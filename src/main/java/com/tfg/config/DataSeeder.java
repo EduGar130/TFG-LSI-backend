@@ -176,7 +176,7 @@ public class DataSeeder {
                         faker.options().nextElement(products),
                         faker.options().nextElement(warehouses),
                         faker.options().nextElement(users),
-                        TransactionType.values()[faker.number().numberBetween(0, 3)],
+                        TransactionType.values()[faker.options().nextElement(List.of(0, 0, 1, 2))], // 50% de reposiciones, 50% de ventas o retiros
                         faker.number().numberBetween(1, 10),
                         faker.lorem().sentence(),
                         faker.date().past(365, TimeUnit.DAYS).toLocalDateTime()
