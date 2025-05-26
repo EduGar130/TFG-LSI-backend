@@ -50,4 +50,18 @@ public class Transaction {
         this.description = description;
         this.createdAt = createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", productId=" + (product != null ? product.getId() : null) +
+                ", warehouseId=" + (warehouse != null ? warehouse.getId() : null) +
+                ", userId=" + (user != null ? user.getId() : null) +
+                ", type=" + type +
+                ", quantity=" + quantity +
+                ", description='" + description + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

@@ -28,4 +28,14 @@ public class Role {
         this.permissions = permissions;
         this.isGlobal = isGlobal;
     }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", permissions='" + permissions + '\'' +
+                ", isGlobal=" + isGlobal +
+                '}';
+    }
 }

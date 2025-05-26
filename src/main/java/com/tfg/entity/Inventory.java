@@ -36,4 +36,13 @@ public class Inventory {
         this.quantity = quantity;
         this.lastUpdated = LocalDateTime.now();
     }
+
+    @Override
+    public String toString() {
+        return "Inventory{" +
+                "id=" + id +
+                ", quantity=" + quantity +
+                ", lastUpdated=" + lastUpdated +
+                '}';
+    }
 }

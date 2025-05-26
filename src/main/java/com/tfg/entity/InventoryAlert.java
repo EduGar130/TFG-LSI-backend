@@ -39,4 +39,16 @@ public class InventoryAlert {
         this.alertType = alertType;
         this.message = message;
     }
+
+    @Override
+    public String toString() {
+        return "InventoryAlert{" +
+                "id=" + id +
+                ", productId=" + (product != null ? product.getId() : null) +
+                ", warehouseId=" + (warehouse != null ? warehouse.getId() : null) +
+                ", alertType='" + alertType + '\'' +
+                ", message='" + message + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

@@ -36,4 +36,14 @@ public class Warehouse {
         this.name = name;
         this.location = location;
     }
+
+    @Override
+    public String toString() {
+        return "Warehouse{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", location='" + location + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

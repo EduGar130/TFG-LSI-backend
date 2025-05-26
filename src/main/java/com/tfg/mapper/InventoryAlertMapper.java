@@ -10,6 +10,7 @@ public class InventoryAlertMapper {
         InventoryAlertDTO dto = new InventoryAlertDTO();
         dto.setId(alert.getId());
         dto.setProduct(ProductMapper.toDto(alert.getProduct()));
+        dto.setWarehouse(WarehouseMapper.toDto(alert.getWarehouse()));
         dto.setAlertType(alert.getAlertType());
         dto.setMessage(alert.getMessage());
         dto.setCreatedAt(alert.getCreatedAt());

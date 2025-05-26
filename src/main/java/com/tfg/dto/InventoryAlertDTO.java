@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class InventoryAlertDTO {
     private Long id;
     private ProductDTO product;
+    private WarehouseDTO warehouse;
     private String alertType;
     private String message;
     private LocalDateTime createdAt;

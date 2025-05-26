@@ -49,9 +49,6 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<Transaction> transactions;
 
-    @OneToMany(mappedBy = "product")
-    private List<InventoryAlert> inventoryAlerts;
-
     public Product(String name, String sku, String description, BigDecimal price, int stockAlertThreshold, Category category) {
         this.name = name;
         this.sku = sku;
@@ -59,5 +56,20 @@ public class Product {
         this.price = price;
         this.stockAlertThreshold = stockAlertThreshold;
         this.category = category;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", sku='" + sku + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", stockAlertThreshold=" + stockAlertThreshold +
+                ", categoryId=" + (category != null ? category.getId() : null) +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

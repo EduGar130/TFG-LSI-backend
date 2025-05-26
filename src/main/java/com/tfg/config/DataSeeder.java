@@ -113,8 +113,8 @@ public class DataSeeder {
             roleRepository.saveAll(List.of(
                     new Role("admin", "[\"full_access\"]", true),
                     new Role("marketing", "[\"view_reports\", \"view_stats\"]", true),
-                    new Role("reponedor", "[\"manage_inventory\", \"view_alerts\", \"manage_transactions\"]", false),
-                    new Role("manager", "[\"create_users\", \"manage_inventory\", \"view_alerts\", \"manage_transactions\"]", false)
+                    new Role("reponedor", "[\"view_inventory\", \"view_alerts\", \"manage_transactions\"]", false),
+                    new Role("manager", "[\"create_users\", \"view_inventory\", \"manage_inventory\", \"view_alerts\", \"manage_transactions\"]", false)
             ));
         }
     }

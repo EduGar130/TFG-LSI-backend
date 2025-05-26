@@ -46,4 +46,17 @@ public class User {
         this.role = role;
         this.warehouse = warehouse;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", roleId=" + (role != null ? role.getId() : null) +
+                ", warehouseId=" + (warehouse != null ? warehouse.getId() : null) +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }
