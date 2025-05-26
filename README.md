@@ -62,13 +62,15 @@ Si no existen datos en la BBDD se ejecuta un seeder que la puebla completamente.
 Asegúrate de tener PostgreSQL activo y configurado correctamente en application.properties.
 
 ### Desde la raíz del backend
+```bash
 ./mvnw spring-boot:run
-
+```
 ### Para generar un JAR ejecutable:
 
+```bash
 ./mvnw clean package
 java -jar target/inventario-back-0.0.1-SNAPSHOT.jar
-
+```
 ## 🧾 Notas adicionales
 
 Todas las entidades están desacopladas del frontend gracias a los DTOs.
