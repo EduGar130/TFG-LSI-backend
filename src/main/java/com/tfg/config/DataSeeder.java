@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tfg.dto.CategoryDTO;
 import com.tfg.dto.ProductDTO;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ import java.net.http.HttpResponse;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DataSeeder {
 
     @Value("${OPENAI_API_KEY}")
@@ -60,6 +62,7 @@ public class DataSeeder {
     @Transactional
     public void seedData() {
         try {
+            log.info("Iniciando el seeding de datos de prueba...");
             seedRoles();
             //seedCategories();
             seedWarehouses();
