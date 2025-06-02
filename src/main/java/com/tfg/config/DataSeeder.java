@@ -59,16 +59,20 @@ public class DataSeeder {
     @PostConstruct
     @Transactional
     public void seedData() {
-        seedRoles();
-        //seedCategories();
-        seedWarehouses();
-        seedCategoriesAndProducts();
-        seedUsers();
-        //seedProducts();
-        seedInventory();
-        seedTransactions();
-        createAlerts();
-        //seedAuditLogs();
+        try {
+            seedRoles();
+            //seedCategories();
+            seedWarehouses();
+            seedCategoriesAndProducts();
+            seedUsers();
+            //seedProducts();
+            seedInventory();
+            seedTransactions();
+            createAlerts();
+            //seedAuditLogs();
+        } catch (Exception e) {
+            System.out.println("Error al inicializar los datos de prueba: " + e.getMessage());
+        }
     }
 
     private void seedUsers() {
