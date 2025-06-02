@@ -50,7 +50,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (transaction.getType() == TransactionType.SALE || transaction.getType() == TransactionType.REMOVE) {
             // Verifica si hay suficiente stock antes de descontar
-            int stockActual = inventoryRepository.tiene(productId, cantidad, warehouseId);
+            Integer stockActual = inventoryRepository.tiene(productId, cantidad, warehouseId);
             if (stockActual >= cantidad) {
                 List<InventoryAlert> inventoryAlerts = inventoryAlertRepository.findByProductAndWarehouse(product, warehouse);
                 Boolean existeAlerta = false;
@@ -74,7 +74,7 @@ public class TransactionServiceImpl implements TransactionService {
                 throw new StockInsuficienteException("No hay suficiente stock para el producto ID " + productId + " en el almacén ID " + warehouseId);
             }
         } else if (transaction.getType() == TransactionType.ADD) {
-            int stockActual = inventoryRepository.tiene(productId, cantidad, warehouseId);
+            Integer stockActual = inventoryRepository.tiene(productId, cantidad, warehouseId);
             if(stockActual <= product.getStockAlertThreshold() && (stockActual + cantidad) > product.getStockAlertThreshold()) {
                //Busca la alerta de inventario y si existe la elimina
                 List<InventoryAlert> inventoryAlerts = inventoryAlertRepository.findByProductAndWarehouse(product, warehouse);

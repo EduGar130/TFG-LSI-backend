@@ -25,7 +25,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
         FROM Inventory i
         WHERE i.product.id = :productId AND i.warehouse.id = :warehouseId AND i.quantity >= :quantity
     """)
-    int tiene(@Param("productId") Long productId,
+    Integer tiene(@Param("productId") Long productId,
                   @Param("quantity") Integer quantity,
                   @Param("warehouseId") Long warehouseId);
 

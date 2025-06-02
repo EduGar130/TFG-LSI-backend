@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findByValido(true);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
-        userRepository.deleteById(id);
+        userRepository.setUserInvalidoById(id);
     }
 
     @Override

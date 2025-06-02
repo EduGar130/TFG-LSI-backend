@@ -1,6 +1,7 @@
 package com.tfg.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -38,6 +39,9 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name ="valido")
+    private Boolean valido;
 
     public User(String username,  String passwordHash, String email, Role role, Warehouse warehouse) {
         this.username = username;
