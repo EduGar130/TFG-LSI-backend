@@ -29,6 +29,12 @@ public class ReportServiceImpl implements ReportService {
 
         document.add(new Paragraph("Fecha de generación: " + LocalDate.now()));
         document.add(new Paragraph(" "));
+        // Filtros aplicados
+        if (stats.getFiltros() != null && !stats.getFiltros().isBlank()) {
+            Paragraph filtros = new Paragraph("Filtros aplicados: \n" + stats.getFiltros(),
+                    FontFactory.getFont(FontFactory.HELVETICA, 12));
+            document.add(filtros);
+        }
 
         // Sección: Ventas por Categoría
         agregarSeccion("Ventas por Categoría", stats.getVentasPorCategoria(), document);

@@ -13,4 +13,5 @@ public class EstadisticasDTO {
     private Map<String, Integer> topProductos;
     private Map<String, Integer> ventasMensuales;
     private String skuSeleccionado;
+    private String filtros;
 }

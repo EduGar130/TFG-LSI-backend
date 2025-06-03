@@ -18,9 +18,9 @@ public class ReportController {
     private ReportService reportService;
 
     @GetMapping("/estadisticas/pdf")
-    public ResponseEntity<byte[]> descargarPDF(@RequestParam(required = false) String sku) {
+    public ResponseEntity<byte[]> descargarPDF(@RequestParam(required = false) String sku, @RequestParam(required = false) String almacen, @RequestParam(required = false) String categoria, @RequestParam(required = false) String fechaInicio, @RequestParam(required = false) String fechaFin) {
         try {
-            EstadisticasDTO dto = estadisticasService.obtenerEstadisticas(sku);
+            EstadisticasDTO dto = estadisticasService.obtenerEstadisticas(sku, almacen, categoria, fechaInicio, fechaFin);
             byte[] pdf = reportService.generarEstadisticasPDF(dto);
 
             HttpHeaders headers = new HttpHeaders();

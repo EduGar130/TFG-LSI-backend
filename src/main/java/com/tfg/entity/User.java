@@ -49,6 +49,7 @@ public class User {
         this.email = email;
         this.role = role;
         this.warehouse = warehouse;
+        this.valido = true;
     }
 
     @Override

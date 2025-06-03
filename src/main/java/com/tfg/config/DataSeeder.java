@@ -95,6 +95,10 @@ public class DataSeeder {
             User marketing = new User("marketing", passwordEncoder.encode("demo123"), faker.internet().emailAddress(), marketingRole, null);
             userRepository.save(marketing);
 
+            //Creamos un manager genérico
+            User genericManager = new User("manager", passwordEncoder.encode("demo123"), faker.internet().emailAddress(), managerRole, warehouses.get(0));
+            userRepository.save(genericManager);
+
             //Creamos un manager para cada almacén
             for (Warehouse warehouse : warehouses) {
                 // Generamos un nombre de usuario único para el manager
@@ -104,10 +108,15 @@ public class DataSeeder {
                 userRepository.save(manager);
             }
 
+            //Creamos un usuario de reponedor genérico
+            User genericReponedor = new User("reponedor", passwordEncoder.encode("demo123"), faker.internet().emailAddress(), reponedorRole, warehouses.get(0));
+            userRepository.save(genericReponedor);
+
             //Creamos entre 5 y 10 reponedores para cada almacén
             for (Warehouse warehouse : warehouses) {
                 int numReponedores = faker.number().numberBetween(5, 10);
                 for (int i = 0; i < numReponedores; i++) {
+                    String username = faker.internet().username().replaceAll("[^a-zA-Z0-9]", "");
                     User reponedor = new User(faker.internet().username(), passwordEncoder.encode("demo123"), faker.internet().emailAddress(), reponedorRole, warehouse);
                     userRepository.save(reponedor);
                 }
