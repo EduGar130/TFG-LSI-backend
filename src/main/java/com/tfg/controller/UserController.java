@@ -107,6 +107,11 @@ public class UserController {
     })
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado con ID " + id);
+        }
+
         userService.deleteUserById(id);
     }
 
