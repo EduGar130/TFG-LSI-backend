@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
@@ -18,9 +20,9 @@ public class ReportController {
     private ReportService reportService;
 
     @GetMapping("/estadisticas/pdf")
-    public ResponseEntity<byte[]> descargarPDF(@RequestParam(required = false) String sku, @RequestParam(required = false) String almacen, @RequestParam(required = false) String categoria, @RequestParam(required = false) String fechaInicio, @RequestParam(required = false) String fechaFin) {
+    public ResponseEntity<byte[]> descargarPDF(@RequestParam(required = false) List<String> sku, @RequestParam(required = false) String almacen, @RequestParam(required = false) String categoria, @RequestParam(required = false) String fechaInicio, @RequestParam(required = false) String fechaFin) {
         try {
-            EstadisticasDTO dto = estadisticasService.obtenerEstadisticas(sku, almacen, categoria, fechaInicio, fechaFin);
+            EstadisticasDTO dto = estadisticasService.obtenerEstadisticas(sku.get(0), almacen, categoria, fechaInicio, fechaFin);
             byte[] pdf = reportService.generarEstadisticasPDF(dto);
 
             HttpHeaders headers = new HttpHeaders();
