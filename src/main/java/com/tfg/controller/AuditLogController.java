@@ -36,4 +36,15 @@ public class AuditLogController {
                 .map(AuditLogMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Operation(
+            summary = "Obtener logs por acción",
+            description = "Devuelve los registros filtrados por el tipo de acción"
+    )
+    @GetMapping("/action/{action}")
+    public List<AuditLogDTO> getLogsByAction(@PathVariable String action) {
+        return auditLogService.getLogsByAction(action).stream()
+                .map(AuditLogMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

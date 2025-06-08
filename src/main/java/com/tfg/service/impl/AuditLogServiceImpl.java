@@ -20,4 +20,9 @@ public class AuditLogServiceImpl implements AuditLogService {
     public List<AuditLog> getAllLogs() {
         return auditLogRepository.findAll();
     }
+
+    @Override
+    public List<AuditLog> getLogsByAction(String action) {
+        return auditLogRepository.findByAction(action);
+    }
 }
