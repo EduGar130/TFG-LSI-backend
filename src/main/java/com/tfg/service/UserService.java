@@ -18,4 +18,6 @@ public interface UserService {
     void deleteUserById(Long id);
 
     String getPermissionsByUsername(String username);
+
+    User getUserByUsername(String username);
 }

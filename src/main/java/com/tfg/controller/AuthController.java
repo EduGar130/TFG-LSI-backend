@@ -45,6 +45,9 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
+        if(!userService.getUserByUsername(request.getUsername()).getValido()) {
+            throw new BadCredentialsException("Usuario no encontrado");
+        }
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
         Long warehouseId = userService.getWarehouseIdByUsername(request.getUsername());
         String permisos = userService.getPermissionsByUsername(request.getUsername());
