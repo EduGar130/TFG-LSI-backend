@@ -4,6 +4,7 @@ import com.tfg.dto.UserDTO;
 import com.tfg.entity.User;
 import com.tfg.exception.ResourceNotFoundException;
 import com.tfg.mapper.UserMapper;
+import com.tfg.security.config.RequiresPermission;
 import com.tfg.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,6 +35,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("create_users")
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers().stream()
@@ -51,6 +53,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado con el ID especificado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("create_users")
     @GetMapping("/{id}")
     public UserDTO getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
@@ -70,6 +73,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("create_users")
     @PostMapping("/add")
     public UserDTO createUser(@RequestBody UserDTO userDTO) {
         User user = UserMapper.toEntity(userDTO);
@@ -88,6 +92,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("create_users")
     @PutMapping("/update")
     public UserDTO updateUser(@RequestBody UserDTO userDTO) {
         User user = UserMapper.toEntity(userDTO);
@@ -105,6 +110,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("create_users")
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id) {
         User user = userService.getUserById(id);

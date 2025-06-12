@@ -2,6 +2,7 @@ package com.tfg.controller;
 
 import com.tfg.dto.InventoryDTO;
 import com.tfg.mapper.InventoryMapper;
+import com.tfg.security.config.RequiresPermission;
 import com.tfg.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,8 +35,10 @@ public class InventoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Inventario obtenido correctamente"),
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado – permisos insuficientes"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("view_inventory")
     @GetMapping("/get")
     public List<InventoryDTO> getAllInventory() {
         return inventoryService.getAllInventories().stream()
@@ -50,6 +53,7 @@ public class InventoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Inventario obtenido correctamente"),
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado – permisos insuficientes"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping("/get/{warehouseId}")
@@ -66,9 +70,11 @@ public class InventoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Inventario eliminado correctamente"),
             @ApiResponse(responseCode = "404", description = "Inventario no encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado – permisos insuficientes"),
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("manage_inventory")
     @DeleteMapping("/delete/{id}")
     public void deleteInventory(@PathVariable Long id) {
         inventoryService.deleteInventoryById(id);
@@ -82,8 +88,10 @@ public class InventoryController {
             @ApiResponse(responseCode = "201", description = "Producto añadido correctamente al inventario"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta – datos inválidos"),
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado – permisos insuficientes"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("manage_inventory")
     @PostMapping("/add")
     public InventoryDTO addInventory(@RequestBody InventoryDTO inventoryDTO) {
         return InventoryMapper.toDto(inventoryService.addInventory(InventoryMapper.toEntity(inventoryDTO)));
@@ -98,8 +106,10 @@ public class InventoryController {
             @ApiResponse(responseCode = "404", description = "Producto no encontrado"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta – datos inválidos"),
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado – permisos insuficientes"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("manage_inventory")
     @PutMapping("/update/{id}")
     public InventoryDTO updateInventory(@PathVariable Long id, @RequestBody InventoryDTO inventoryDTO) {
         return InventoryMapper.toDto(inventoryService.updateInventory(id, InventoryMapper.toEntity(inventoryDTO)));
@@ -113,8 +123,10 @@ public class InventoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "CSV generado correctamente"),
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado – permisos insuficientes"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("view_inventory")
     @GetMapping("/generate-csv")
     public ResponseEntity<byte[]> generateInventoryCsv() {
         try {
@@ -136,8 +148,10 @@ public class InventoryController {
             @ApiResponse(responseCode = "200", description = "Inventario importado correctamente"),
             @ApiResponse(responseCode = "400", description = "CSV mal formado o datos inválidos"),
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado – permisos insuficientes"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("manage_inventory")
     @PostMapping("/import-csv")
     public ResponseEntity<String> importCsv(@RequestParam("file") MultipartFile file) {
         try {

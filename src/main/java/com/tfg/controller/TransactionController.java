@@ -5,6 +5,7 @@ import com.tfg.entity.Transaction;
 import com.tfg.entity.TransactionType;
 import com.tfg.mapper.InventoryMapper;
 import com.tfg.mapper.TransactionMapper;
+import com.tfg.security.config.RequiresPermission;
 import com.tfg.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -55,6 +56,7 @@ public class TransactionController {
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("manage_transactions")
     @PostMapping("/add")
     public TransactionDTO addTransaction(@RequestBody @Valid TransactionDTO dto) {
         return TransactionMapper.toDto(transactionService.saveTransaction(TransactionMapper.toEntity(dto)));

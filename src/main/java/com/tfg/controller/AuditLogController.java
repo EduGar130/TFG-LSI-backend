@@ -2,6 +2,7 @@ package com.tfg.controller;
 
 import com.tfg.dto.AuditLogDTO;
 import com.tfg.mapper.AuditLogMapper;
+import com.tfg.security.config.RequiresPermission;
 import com.tfg.service.AuditLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/audit-logs")
+@SecurityRequirement(name = "bearerAuth")
 public class AuditLogController {
 
     private final AuditLogService auditLogService;
@@ -30,6 +32,7 @@ public class AuditLogController {
                     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
             }
     )
+    @RequiresPermission("full_access")
     @GetMapping
     public List<AuditLogDTO> getAllLogs() {
         return auditLogService.getAllLogs().stream()
@@ -41,6 +44,7 @@ public class AuditLogController {
             summary = "Obtener logs por acción",
             description = "Devuelve los registros filtrados por el tipo de acción"
     )
+    @RequiresPermission("full_access")
     @GetMapping("/action/{action}")
     public List<AuditLogDTO> getLogsByAction(@PathVariable String action) {
         return auditLogService.getLogsByAction(action).stream()

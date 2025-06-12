@@ -12,9 +12,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final List<String> EXCLUDED_PATHS = List.of(
+            "/api/auth/",        // login, registro
+            "/swagger-ui",       // Swagger UI base
+            "/swagger-ui/",      // Swagger UI con slash
+            "/swagger-ui.html",
+            "/v3/api-docs"
+    );
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -28,6 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+
+        String path = request.getRequestURI();
+
+        if (EXCLUDED_PATHS.stream().anyMatch(path::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);

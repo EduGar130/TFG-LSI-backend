@@ -2,11 +2,13 @@ package com.tfg.controller;
 
 import com.tfg.dto.InventoryAlertDTO;
 import com.tfg.mapper.InventoryAlertMapper;
+import com.tfg.security.config.RequiresPermission;
 import com.tfg.service.InventoryAlertService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +34,7 @@ public class InventoryAlertController {
             @ApiResponse(responseCode = "401", description = "No autorizado – token JWT ausente o inválido"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("view_alerts")
     @GetMapping("/get")
     public List<InventoryAlertDTO> getAllAlerts() {
         return alertService.getAllAlerts().stream()

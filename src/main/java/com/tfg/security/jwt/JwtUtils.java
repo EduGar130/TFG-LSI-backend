@@ -1,5 +1,6 @@
 package com.tfg.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,10 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {
@@ -58,6 +57,22 @@ public class JwtUtils {
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
+        }
+    }
+
+    public List<String> extractPermissions(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String permisosJson = (String) claims.get("permisos");
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(permisosJson, List.class);
+        } catch (Exception e) {
+            return List.of();
         }
     }
 }

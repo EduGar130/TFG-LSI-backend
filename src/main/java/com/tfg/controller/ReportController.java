@@ -1,6 +1,7 @@
 package com.tfg.controller;
 
 import com.tfg.dto.EstadisticasDTO;
+import com.tfg.security.config.RequiresPermission;
 import com.tfg.service.EstadisticasService;
 import com.tfg.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,7 @@ public class ReportController {
         @ApiResponse(responseCode = "400", description = "Parámetros inválidos o incompletos"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @RequiresPermission("view_reports")
     @GetMapping("/estadisticas/pdf")
     public ResponseEntity<byte[]> descargarPDF(@RequestParam(required = false) List<String> sku, @RequestParam(required = false) String almacen, @RequestParam(required = false) String categoria, @RequestParam(required = false) String fechaInicio, @RequestParam(required = false) String fechaFin) {
         try {
