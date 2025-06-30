@@ -1,10 +1,13 @@
 package com.tfg.controller;
 
 import com.tfg.dto.EstadisticasDTO;
+import com.tfg.exception.GlobalExceptionHandler;
 import com.tfg.security.config.RequiresPermission;
 import com.tfg.service.EstadisticasService;
 import com.tfg.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,9 +33,30 @@ public class ReportController {
         description = "Genera y descarga un archivo PDF con las estadísticas basadas en los parámetros proporcionados."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "PDF generado y descargado correctamente"),
-        @ApiResponse(responseCode = "400", description = "Parámetros inválidos o incompletos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(
+            responseCode = "200",
+            description = "PDF generado y descargado correctamente",
+            content = @Content(
+                mediaType = "application/pdf",
+                schema = @Schema(example = "Archivo PDF generado con éxito.")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Parámetros inválidos o incompletos",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{\"timestamp\": \"2023-10-01T12:00:00\", \"status\": 400, \"error\": \"Bad Request\", \"message\": \"Parámetros inválidos o incompletos.\"}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{\"timestamp\": \"2023-10-01T12:00:00\", \"status\": 500, \"error\": \"Internal Server Error\", \"message\": \"Ha ocurrido un error inesperado.\"}")
+            )
+        )
     })
     @RequiresPermission("view_reports")
     @GetMapping("/estadisticas/pdf")
