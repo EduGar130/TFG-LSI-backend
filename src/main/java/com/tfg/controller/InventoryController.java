@@ -72,7 +72,6 @@ public class InventoryController {
                     )
             )
     })
-    @RequiresPermission("view_inventory")
     @GetMapping("/get")
     public ResponseEntity<?> getAllInventory() {
         try {
